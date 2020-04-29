@@ -1,6 +1,7 @@
 package com.kizitonwose.calendarview.model
 
 import com.kizitonwose.calendarview.utils.next
+import com.kizitonwose.calendarview.utils.previous
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.LocalDate
 import org.threeten.bp.YearMonth
@@ -47,7 +48,8 @@ internal data class MonthConfig(
         ): List<CalendarMonth> {
             val months = mutableListOf<CalendarMonth>()
             var currentMonth = startMonth
-            while (currentMonth <= endMonth) {
+            val reverseOrder = currentMonth > endMonth
+            while ((!reverseOrder && currentMonth <= endMonth) || reverseOrder && currentMonth >= endMonth) {
                 val generateInDates = when (inDateStyle) {
                     InDateStyle.ALL_MONTHS -> true
                     InDateStyle.FIRST_MONTH -> currentMonth == startMonth
@@ -67,7 +69,9 @@ internal data class MonthConfig(
                 })
 
                 months.addAll(calendarMonths)
-                if (currentMonth != endMonth) currentMonth = currentMonth.next else break
+                if (currentMonth != endMonth)
+                    currentMonth = if(reverseOrder) currentMonth.previous else currentMonth.next
+                else break
             }
 
             return months
